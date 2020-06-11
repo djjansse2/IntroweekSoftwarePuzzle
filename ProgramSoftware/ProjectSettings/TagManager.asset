@@ -4,10 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Start Node
-  - End Node
-  - Dragable
   - Port
+  - Node
   layers:
   - Default
   - TransparentFX

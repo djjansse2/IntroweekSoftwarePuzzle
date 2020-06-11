@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class User : MonoBehaviour
 {
+	/*
+	 * Macros
+	 */
+	private const string NodeTag = "Node";
+	private const string PortTag = "Port";
+
+
 	private GameObject	_nodeDragging;
 	private bool		_isDragging;
 
@@ -63,8 +70,11 @@ public class User : MonoBehaviour
 		/*
 		 * If object has dragable tag (nodes),
 		 * handle dragging
+		 * 
+		 * if the user is already dragging a node
+		 * the user would likely click on this node
 		 */
-		if (aObjectClicked.CompareTag("Dragable"))
+		if (aObjectClicked.CompareTag(NodeTag))
 		{
 			/*
 			 * Only handle dragging when not
@@ -72,17 +82,15 @@ public class User : MonoBehaviour
 			 */
 			if (!_isLinking)
 			{
-				// Save node to variable
-				_nodeDragging = aObjectClicked.parent.gameObject;
-				// Start dragging in coroutine (seperate task)
-				StartCoroutine("DragNode");
+				// Handle node moving
+				DragNode(aObjectClicked.gameObject);
 			}
 		}
 		/*
 		 * If object is a port, handle node
 		 * linking
 		 */
-		else if (aObjectClicked.CompareTag("Port"))
+		else if (aObjectClicked.CompareTag(PortTag))
 		{
 			/*
 			 * Check whether a node is being dragged
@@ -92,6 +100,33 @@ public class User : MonoBehaviour
 				// Handle linking
 				LinkNodes(aObjectClicked.gameObject);
 			}
+		}
+	}
+
+	/*
+	 * Handles node moving
+	 * 
+	 * aNodeToMove	: nodeToMove
+	 */
+	public void DragNode(GameObject aNodeToMove)
+	{
+		/*
+		 * If user is not dragging yet, start dragging
+		 */
+		if (!_isDragging)
+		{
+			// Save node to variable
+			_nodeDragging = aNodeToMove;
+			// Start dragging in coroutine (seperate task)
+			StartCoroutine("MoveNode");
+		}
+		/*
+		 * If user is dragging, stop dragging
+		 */
+		else
+		{
+			// Reset dragging flag
+			_isDragging = false;
 		}
 	}
 
@@ -199,32 +234,12 @@ public class User : MonoBehaviour
 		{
 			StopLinking();
 		}
-		/*
-		 * If a node is being dragged, stop
-		 * dragging and leave node there
-		 */
-		if (_isDragging)
-		{
-			_isDragging = false;
-		}
-	}
-
-	/*
-	 * Creates a new node
-	 * 
-	 * aNewNode	: Node to be created
-	 */
-	public void AddNode(GameObject aNewNode)
-	{
-		// Immediately start dragging new node
-		_nodeDragging = (GameObject)Instantiate(aNewNode);
-		StartCoroutine("DragNode");
 	}
 
 	/*
 	 * Corourinte for dragging a node
 	 */
-	public IEnumerator DragNode()
+	public IEnumerator MoveNode()
 	{
 		// Set dragging flag
 		_isDragging = true;

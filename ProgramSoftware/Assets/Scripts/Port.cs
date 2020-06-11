@@ -5,6 +5,7 @@ using UnityEngine;
 public class Port : MonoBehaviour
 {
 	public bool			isInput;
+	public bool			isAlternative;
 	public bool			isLinked;
 
 	public GameObject	portLinkedTo;
@@ -21,28 +22,14 @@ public class Port : MonoBehaviour
 	 */
 	public void Link(GameObject aPortToLinkTo, GameObject aLineObject, int aLineIndex)
 	{
-		Node parentNode	= GetComponentInParent<Node>();
-		lineObject		= aLineObject;
-		lineIndex		= aLineIndex;
+		Node parentNode		= GetComponentInParent<Node>();
+		Node nodeToLinkTo	= aPortToLinkTo.GetComponentInParent<Node>();
+		lineObject			= aLineObject;
+		lineIndex			= aLineIndex;
 
 		portLinkedTo = aPortToLinkTo;
 
-		/*
-		 * If this is an input port, set the
-		 * previous node on parent node
-		 */
-		if (isInput)
-		{
-			parentNode.previousNode = aPortToLinkTo.GetComponentInParent<Node>();
-		}
-		/*
-		 * If this is an output port, set
-		 * the next node on parent node
-		 */
-		else
-		{
-			parentNode.nextNode = aPortToLinkTo.GetComponentInParent<Node>();
-		}
+		parentNode.Link(nodeToLinkTo, this);
 
 		// Set is linked flag
 		isLinked = true;

@@ -5,14 +5,33 @@ using UnityEngine;
 public enum NodeType
 {
 	START,
-	END
+	END,
+	IF,
+	JOIN,
+	READ_INPUT
 }
 
-public abstract class Node : MonoBehaviour
+public class Node : MonoBehaviour
 {
     public Node	previousNode;
 	public Node	nextNode;
 
-	public abstract void Parse();
-	public abstract NodeType GetNodeType();
+	public virtual void Parse() { }
+
+	public virtual void Link(Node aNodeToLinkTo, Port aPortToLinkFrom)
+	{
+		if (aPortToLinkFrom.isInput)
+		{
+			previousNode = aNodeToLinkTo;
+		}
+		else
+		{
+			nextNode = aNodeToLinkTo;
+		}
+	}
+
+	public virtual NodeType GetNodeType()
+	{
+		return default;
+	}
 }
