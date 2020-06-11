@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node : MonoBehaviour
+public enum NodeType
+{
+	START,
+	END
+}
+
+public abstract class Node : MonoBehaviour
 {
     public Node	previousNode;
 	public Node	nextNode;
 
-	public virtual void Parse() {}
+	public abstract void Parse();
+	public abstract NodeType GetNodeType();
 }
