@@ -555,3 +555,4 @@ C:\Users\Daniel\Desktop\Technische Informatica\JAAR 3\BLOK 11\PROJ BOM\Software 
 C:\Users\Daniel\Desktop\Technische Informatica\JAAR 3\BLOK 11\PROJ BOM\Software Puzzle\ProgramSoftware\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 C:\Users\Daniel\Desktop\Technische Informatica\JAAR 3\BLOK 11\PROJ BOM\Software Puzzle\ProgramSoftware\obj\Debug\Assembly-CSharp.dll
 C:\Users\Daniel\Desktop\Technische Informatica\JAAR 3\BLOK 11\PROJ BOM\Software Puzzle\ProgramSoftware\obj\Debug\Assembly-CSharp.pdb
+C:\Users\Daniel\Desktop\Technische Informatica\JAAR 3\BLOK 11\PROJ BOM\Software Puzzle\ProgramSoftware\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache

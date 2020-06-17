@@ -9,8 +9,8 @@ public class EndNode : Node
 		return NodeType.END;
 	}
 
-	public override void Parse()
+	public override bool Parse()
 	{
-		
+		return false;
 	}
 }

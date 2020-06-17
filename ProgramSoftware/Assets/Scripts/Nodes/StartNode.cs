@@ -9,8 +9,8 @@ public class StartNode : Node
 		return NodeType.START;
 	}
 
-	public override void Parse()
+	public override bool Parse()
 	{
-		
+		return true;
 	}
 }

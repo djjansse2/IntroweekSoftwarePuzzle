@@ -30,8 +30,12 @@ public class IfNode : Node
 		}
 	}
 
-	public override void Parse()
+	public override bool Parse()
 	{
-		
+		Parser parser = Parser.instance;
+
+		parser.AddCommand(Parser.CMD_IF, ++parser.ifCount, this);
+		parser.AddCommand(parser.ifCount, this);
+		return true;
 	}
 }

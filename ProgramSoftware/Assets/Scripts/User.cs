@@ -74,6 +74,17 @@ public class User : MonoBehaviour
 		 * if the user is already dragging a node
 		 * the user would likely click on this node
 		 */
+
+		/*
+		 * If user is dragging, stop dragging
+		 */
+		if (_isDragging)
+		{
+			// Reset dragging flag
+			_isDragging = false;
+			return;
+		}
+
 		if (aObjectClicked.CompareTag(NodeTag))
 		{
 			/*
@@ -92,14 +103,8 @@ public class User : MonoBehaviour
 		 */
 		else if (aObjectClicked.CompareTag(PortTag))
 		{
-			/*
-			 * Check whether a node is being dragged
-			 */
-			if (!_isDragging)
-			{
-				// Handle linking
-				LinkNodes(aObjectClicked.gameObject);
-			}
+			// Handle linking
+			LinkNodes(aObjectClicked.gameObject);
 		}
 	}
 
@@ -119,14 +124,6 @@ public class User : MonoBehaviour
 			_nodeDragging = aNodeToMove;
 			// Start dragging in coroutine (seperate task)
 			StartCoroutine("MoveNode");
-		}
-		/*
-		 * If user is dragging, stop dragging
-		 */
-		else
-		{
-			// Reset dragging flag
-			_isDragging = false;
 		}
 	}
 
