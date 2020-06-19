@@ -152,7 +152,7 @@ public class User : MonoBehaviour
 		 */
 		if (portToLink.isLinked)
 		{
-			portToLink.UnLink();
+			portToLink.UnLink(true);
 		}
 
 		/*

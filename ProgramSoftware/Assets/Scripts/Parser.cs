@@ -5,11 +5,14 @@ using UnityEngine;
 public class Parser : MonoBehaviour
 {
 	////////// COMMAND MACROS //////////
-	public const int CMD_WRITE	= 100;
-	public const int CMD_READ	= 101;
-	public const int CMD_JUMP	= 102;
-	public const int CMD_IF		= 103;
-	public const int CMD_ENDIF	= 104;
+	public const int CMD_WRITE		= 100;
+	public const int CMD_READ		= 101;
+	public const int CMD_JUMP		= 102;
+	public const int CMD_IF			= 103;
+	public const int CMD_ENDIF		= 104;
+
+	////////// COMMUNICATION MACROS //////////
+	public const int END_PROGRAM	= 199;
 
 
 
@@ -19,7 +22,6 @@ public class Parser : MonoBehaviour
     public static Parser	instance;
 
 	private List<Command>	cmdList			= new List<Command>();
-	private List<int>		finalCmdList	= new List<int>();
 
 
 
@@ -36,7 +38,7 @@ public class Parser : MonoBehaviour
 
 	public void Upload()
 	{
-		cmdList.Clear();
+		ResetParser();
 
 		Node startNode = GetStartNode();
 
@@ -48,6 +50,26 @@ public class Parser : MonoBehaviour
 
 		parseNodes(startNode);
 		Optimize();
+
+		foreach (Command cmd in cmdList)
+		{
+			SerialCommunication.WriteToSerialPort(cmd.command);
+		}
+
+		SerialCommunication.WriteToSerialPort(END_PROGRAM);
+	}
+
+	public void ResetParser()
+	{
+		if (cmdList.Count > 0)
+		{
+			foreach(Command cmd in cmdList)
+			{
+				cmd.node.ResetNode();
+			}
+		}
+
+		cmdList.Clear();
 	}
 
 	#region Node adding

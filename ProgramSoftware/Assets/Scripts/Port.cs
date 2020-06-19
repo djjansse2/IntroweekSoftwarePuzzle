@@ -38,7 +38,7 @@ public class Port : MonoBehaviour
 	/*
 	 * Unlink this node from linked node
 	 */
-	public void UnLink()
+	public void UnLink(bool aUnlinkLinked)
 	{
 		/*
 		 * If this node is not linked, don't
@@ -50,8 +50,11 @@ public class Port : MonoBehaviour
 		// Save parent node to variable
 		Node parentNode	= GetComponentInParent<Node>();
 
-		// Unlink other port aswell
-		portLinkedTo.GetComponent<Port>().UnLink();
+		if (aUnlinkLinked)
+		{
+			// Unlink other port aswell
+			portLinkedTo.GetComponent<Port>().UnLink(false);
+		}
 
 		/*
 		 * If this is an input port, reset
@@ -67,8 +70,11 @@ public class Port : MonoBehaviour
 		 */
 		else
 		{
-			parentNode.previousNode = default;
+			parentNode.nextNode = default;
 		}
+
+		// Delete line
+		Destroy(lineObject);
 
 		// Reset is linked flag
 		isLinked = false;

@@ -35,4 +35,6 @@ public class Node : MonoBehaviour
 	{
 		return default;
 	}
+
+	public virtual void ResetNode() { }
 }

@@ -4,7 +4,7 @@ using System.Collections;
 public class JoinNode : Node
 {
 	public Node altPreviousNode;
-	private bool isSaturated = false;
+	private bool _isSaturated = false;
 
 	public override NodeType GetNodeType()
 	{
@@ -34,13 +34,13 @@ public class JoinNode : Node
 	{
 		Parser parser = Parser.instance;
 
-		if (!isSaturated)
+		if (!_isSaturated)
 		{
 			parser.AddCommand(Parser.CMD_JUMP, parser.ifCount, this);
 			parser.AddCommand(parser.ifCount, this);
 			IfNode prevIf = (IfNode)parser.FindIfWithLabel(parser.ifCount).node;
 			parser.currentNode = prevIf.altNextNode;
-			isSaturated = true;
+			_isSaturated = true;
 			return false;
 		}
 		else
@@ -49,5 +49,10 @@ public class JoinNode : Node
 			--parser.ifCount;
 			return true;
 		}
+	}
+
+	public override void ResetNode()
+	{
+		_isSaturated = false;
 	}
 }

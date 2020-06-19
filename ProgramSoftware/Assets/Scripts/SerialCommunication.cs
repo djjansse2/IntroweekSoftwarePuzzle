@@ -10,7 +10,7 @@ public class SerialCommunication : MonoBehaviour
 
     private void Start()
     {
-        _serPort = new SerialPort("COM9", 9600);
+        _serPort = new SerialPort("COM7", 9600);
 		_serPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
 
 		try
@@ -21,19 +21,45 @@ public class SerialCommunication : MonoBehaviour
 		{
 			Debug.LogError(ex);
 		}
+
+		StartCoroutine("ReadSerialPort");
     }
 
-    public static void WriteToSerialPort(string aMessage)
+	private void OnApplicationQuit()
+	{
+		_serPort.Close();
+	}
+
+	public static void WriteToSerialPort(int aMessage)
 	{
 		Debug.Log("Sent: " + aMessage);
 
+		byte[] byteBuffer = new byte[] { (byte) aMessage };
+
 		try
 		{
-			_serPort.Write(aMessage);
+			_serPort.Write(byteBuffer, 0, 1);
 		}
 		catch (IOException ex)
 		{
 			Debug.LogError(ex);
+		}
+	}
+
+	public IEnumerator ReadSerialPort()
+	{
+		while (_serPort.IsOpen)
+		{
+			if (_serPort.BytesToRead > 0)
+			{
+				byte[] buffer = new byte[1];
+
+				 _serPort.Read(buffer, 0, 1);
+
+				Debug.Log("Read: " + buffer[0]);
+			}
+
+			yield return null;
 		}
 	}
 
