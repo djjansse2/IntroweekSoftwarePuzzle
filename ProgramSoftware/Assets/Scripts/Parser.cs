@@ -14,6 +14,7 @@ public class Parser : MonoBehaviour
 
 	////////// COMMUNICATION MACROS //////////
 	public const int END_PROGRAM	= 199;
+	public const int PROGRAM_SUCCES	= 198;
 
 
 
@@ -42,6 +43,7 @@ public class Parser : MonoBehaviour
 	private void Start()
 	{
 		notificationHandler = NotificationHandler.instance;
+		SerialCommunication.dataReceivedCallback += CheckProgramFeedback;
 	}
 
 	public void Upload()
@@ -180,6 +182,14 @@ public class Parser : MonoBehaviour
 		}
 
 		return default;
+	}
+
+	public void CheckProgramFeedback(int aFeedback)
+	{
+		if (aFeedback == PROGRAM_SUCCES)
+		{
+			notificationHandler.NotifySucces("Programming succes");
+		}
 	}
 }
 

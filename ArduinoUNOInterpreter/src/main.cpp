@@ -4,11 +4,12 @@
 
 #include "Interpreter.h"
 
-#define END_PROGRAM	199
+#define END_PROGRAM		199
+#define PROGRAM_SUCCESS	198
 
-#define STATE_PIN	12
-#define RESET_DELAY 10
-#define RESET_BLINK 100
+#define STATE_PIN		12
+#define RESET_DELAY 	10
+#define RESET_BLINK 	100
 
 static Interpreter* myInterpreter = new Interpreter();
 
@@ -41,6 +42,7 @@ void setup()
 
 	digitalWrite(STATE_PIN, HIGH);
 	while (!taskReadPort());
+	Serial.print((char)PROGRAM_SUCCESS);
 	digitalWrite(STATE_PIN, LOW);
 }
 

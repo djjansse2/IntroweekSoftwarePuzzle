@@ -8,6 +8,9 @@ public class SerialCommunication : MonoBehaviour
 {
 	public string				defaultCOMPort	= "com1";
 
+	public delegate void DataReceivedCallback(int aData);
+	public static DataReceivedCallback dataReceivedCallback;
+
     private static SerialPort	_serPort;
 
 	private static string		_serPortID;
@@ -81,6 +84,11 @@ public class SerialCommunication : MonoBehaviour
 				 _serPort.Read(buffer, 0, 1);
 
 				Debug.Log("Read: " + buffer[0]);
+
+				if (dataReceivedCallback != null)
+				{
+					dataReceivedCallback.Invoke(buffer[0]);
+				}
 			}
 
 			yield return null;

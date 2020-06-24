@@ -33,6 +33,12 @@ public class NotificationHandler : MonoBehaviour
 		Debug.LogError(aError);
 	}
 
+	public void NotifySucces(string aSucces)
+	{
+		Notify(Color.green, aSucces);
+		Debug.Log(aSucces);
+	}
+
 	private void Notify(Color aBackgroundColour, string aMessage)
 	{
 		notificationImage.color	= aBackgroundColour;
