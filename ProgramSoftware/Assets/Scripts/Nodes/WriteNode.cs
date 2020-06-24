@@ -10,7 +10,7 @@ public class WriteNode : Node
 
 	public override NodeType GetNodeType()
 	{
-		return NodeType.WRITE;
+		return NodeType.PIN_MODE;
 	}
 
 	public override bool Parse()

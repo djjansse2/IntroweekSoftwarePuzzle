@@ -9,7 +9,8 @@ public enum NodeType
 	IF,
 	JOIN,
 	READ_INPUT,
-	WRITE
+	WRITE,
+	PIN_MODE
 }
 
 public class Node : MonoBehaviour
@@ -37,4 +38,14 @@ public class Node : MonoBehaviour
 	}
 
 	public virtual void ResetNode() { }
+
+	public virtual void DeleteNode()
+	{
+		foreach (Port p in GetComponentsInChildren<Port>())
+		{
+			p.UnLink(true);
+		}
+
+		Destroy(this.gameObject);
+	}
 }

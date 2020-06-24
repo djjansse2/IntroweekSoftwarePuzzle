@@ -10,6 +10,7 @@ public class Parser : MonoBehaviour
 	public const int CMD_JUMP		= 102;
 	public const int CMD_IF			= 103;
 	public const int CMD_ENDIF		= 104;
+	public const int CMD_SET_MODE	= 105;
 
 	////////// COMMUNICATION MACROS //////////
 	public const int END_PROGRAM	= 199;
@@ -22,6 +23,8 @@ public class Parser : MonoBehaviour
     public static Parser	instance;
 
 	private List<Command>	cmdList			= new List<Command>();
+
+	private NotificationHandler notificationHandler;
 
 
 
@@ -36,6 +39,11 @@ public class Parser : MonoBehaviour
 		instance = this;
 	}
 
+	private void Start()
+	{
+		notificationHandler = NotificationHandler.instance;
+	}
+
 	public void Upload()
 	{
 		ResetParser();
@@ -44,11 +52,11 @@ public class Parser : MonoBehaviour
 
 		if (startNode == default)
 		{
-			Debug.LogError("No start node present");
+			notificationHandler.NotifyError("No start node present");
 			return;
 		}
 
-		parseNodes(startNode);
+		if (!parseNodes(startNode)) return;
 		Optimize();
 
 		foreach (Command cmd in cmdList)
@@ -105,7 +113,7 @@ public class Parser : MonoBehaviour
 	{
 		if (aStartNode.nextNode == default)
 		{
-			Debug.LogError("No nodes attached to start node");
+			notificationHandler.NotifyError("No nodes attached to start node");
 			return false;
 		}
 
@@ -117,7 +125,7 @@ public class Parser : MonoBehaviour
 		{
 			if (currentNode.nextNode == default)
 			{
-				Debug.LogError("Floating input found at: " + currentNode);
+				notificationHandler.NotifyError("Floating input found at: " + currentNode);
 				return false;
 			}
 

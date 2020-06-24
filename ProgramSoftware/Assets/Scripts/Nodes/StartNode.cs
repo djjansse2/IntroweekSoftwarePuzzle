@@ -13,4 +13,9 @@ public class StartNode : Node
 	{
 		return true;
 	}
+
+	public override void DeleteNode()
+	{
+		NotificationHandler.instance.NotifyWarning("Do Not Delete Start Node");
+	}
 }

@@ -13,4 +13,9 @@ public class EndNode : Node
 	{
 		return false;
 	}
+
+	public override void DeleteNode()
+	{
+		NotificationHandler.instance.NotifyWarning("Do Not Delete End Node");
+	}
 }

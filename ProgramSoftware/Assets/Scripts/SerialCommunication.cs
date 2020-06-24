@@ -6,12 +6,18 @@ using UnityEngine;
 
 public class SerialCommunication : MonoBehaviour
 {
+	public string				defaultCOMPort	= "com1";
+
     private static SerialPort	_serPort;
 
 	private static string		_serPortID;
 
+	private NotificationHandler	notificationHandler;
+
     private void Start()
     {
+		notificationHandler = NotificationHandler.instance;
+
 		OpenSerialPort();
 
 		StartCoroutine("ReadSerialPort");
@@ -31,6 +37,12 @@ public class SerialCommunication : MonoBehaviour
 	{
 		if (_serPort != null) return;
 
+		if (_serPortID == default)
+		{
+			_serPortID = defaultCOMPort;
+			notificationHandler.NotifyWarning("Using Default COM port");
+		}
+
 		_serPort = new SerialPort(_serPortID, 9600);
 		_serPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
 
@@ -40,14 +52,12 @@ public class SerialCommunication : MonoBehaviour
 		}
 		catch (IOException ex)
 		{
-			Debug.LogError(ex);
+			notificationHandler.NotifyError(ex.Message);
 		}
 	}
 
 	public static void WriteToSerialPort(int aMessage)
 	{
-		Debug.Log("Sent: " + aMessage);
-
 		byte[] byteBuffer = new byte[] { (byte) aMessage };
 
 		try
@@ -56,7 +66,7 @@ public class SerialCommunication : MonoBehaviour
 		}
 		catch (IOException ex)
 		{
-			Debug.LogError(ex);
+			NotificationHandler.instance.NotifyError(ex.Message);
 		}
 	}
 
@@ -85,7 +95,7 @@ public class SerialCommunication : MonoBehaviour
 		}
 		catch (IOException ex)
 		{
-			Debug.LogError(ex);
+			notificationHandler.NotifyError(ex.Message);
 		}
 	}
 }

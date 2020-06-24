@@ -4,19 +4,23 @@ using UnityEngine;
 
 public class User : MonoBehaviour
 {
+	[Header("Input")]
+	public	KeyCode			selectKey	= KeyCode.Mouse0;
+	public	KeyCode			deleteKey	= KeyCode.Delete;
+
 	/*
 	 * Macros
 	 */
-	private const string NodeTag = "Node";
-	private const string PortTag = "Port";
+	private	const string	NodeTag	= "Node";
+	private	const string	PortTag	= "Port";
 
 
-	private GameObject	_nodeDragging;
-	private bool		_isDragging;
+	private GameObject		_nodeDragging;
+	private bool			_isDragging;
 
-	private GameObject	_firstPort;
-	private bool		_isLinking;
-	private GameObject	_lineObject;
+	private GameObject		_firstPort;
+	private bool			_isLinking;
+	private GameObject		_lineObject;
 
 	private void Update()
 	{
@@ -24,9 +28,13 @@ public class User : MonoBehaviour
 		 * If user clicked left mouse button,
 		 * handle user click
 		 */
-		if (Input.GetKeyDown(KeyCode.Mouse0))
+		if (Input.GetKeyDown(selectKey))
 		{
 			UserClickedMouse();
+		}
+		if (Input.GetKeyDown(deleteKey))
+		{
+			DeleteNode();
 		}
 	}
 
@@ -200,6 +208,16 @@ public class User : MonoBehaviour
 		}
 	}
 
+	private void DeleteNode()
+	{
+		if (!_isDragging) return;
+
+		_nodeDragging.GetComponent<Node>().DeleteNode();
+
+		_nodeDragging = default;
+		_isDragging = false;
+	}
+
 	/*
 	 * Stop linking ports
 	 */
@@ -230,6 +248,21 @@ public class User : MonoBehaviour
 		if (_isLinking)
 		{
 			StopLinking();
+		}
+	}
+
+	public void ClearNodes()
+	{
+		GameObject[] allNodes = GameObject.FindGameObjectsWithTag("Node");
+
+		foreach (GameObject go in allNodes)
+		{
+			Node currentNode = go.GetComponent<Node>();
+			if (currentNode.GetNodeType() != NodeType.START &&
+				currentNode.GetNodeType() != NodeType.END)
+			{
+				currentNode.DeleteNode();
+			}
 		}
 	}
 
