@@ -5,13 +5,17 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
 	[Header("Movement Settings")]
-	public float	movespeed	= 1.0f;
-	public KeyCode	moveKey		= KeyCode.Mouse2;
+	public float	movespeed				= 1.0f;
+	public KeyCode	moveKey					= KeyCode.Mouse2;
+	public KeyCode	recentreKey				= KeyCode.Space;
 
 	[Header("Scrolling Settings")]
-	public float	maxScroll	= 20;
-	public float	minScroll	= 1;
-	public float	scrollSpeed	= 1;
+	public float	maxScroll				= 20;
+	public float	minScroll				= 1;
+	public float	scrollSpeed				= 1;
+
+	[Header("Miscellanious settings")]
+	public Vector3	_defaultCameraPosition	= new Vector3(0, 0, -10);
 
 	private Camera	_camera;
 
@@ -19,24 +23,23 @@ public class CameraMovement : MonoBehaviour
 	{
 		// Save camera component to variable for performance
 		_camera = GetComponent<Camera>();
+		transform.position = _defaultCameraPosition;
 	}
 
 	void Update()
     {
 		/*
-		 * Zoom in and out using the mouse wheel,
-		 * only when the cursor is positioned
-		 * within the view window.
+		 * If the users cursor is not over the game window
+		 * stop movement
 		 */
-		if (isMouseOverGameWindow())
-		{
-			// Change the camera size on scroll
-			_camera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
-			// Clamp the camera size to remain between predefined values
-			_camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize, minScroll, maxScroll);
-		}
+		if (!isMouseOverGameWindow())
+			return;
 
-
+		// Change the camera size on scroll
+		_camera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+		// Clamp the camera size to remain between predefined values
+		_camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize, minScroll, maxScroll);
+		
 		/*
 		 * If the move key is pressed, disable
 		 * the cursor and move the camera by
@@ -64,6 +67,15 @@ public class CameraMovement : MonoBehaviour
 			Cursor.lockState = CursorLockMode.None;
 			// Make the cursor visible again
 			Cursor.visible = true;
+		}
+
+		/*
+		 * If the user presses the recentre key,
+		 * reset the camera to it's default position
+		 */
+		if (Input.GetKeyDown(recentreKey))
+		{
+			transform.position = _defaultCameraPosition;
 		}
     }
 

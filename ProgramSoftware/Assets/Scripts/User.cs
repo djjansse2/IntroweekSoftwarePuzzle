@@ -25,13 +25,15 @@ public class User : MonoBehaviour
 	private void Update()
 	{
 		/*
-		 * If user clicked left mouse button,
-		 * handle user click
+		 * If userselect key, handle user click
 		 */
 		if (Input.GetKeyDown(selectKey))
 		{
 			UserClickedMouse();
 		}
+		/*
+		 * If user clicked delete key, handle delete
+		 */
 		if (Input.GetKeyDown(deleteKey))
 		{
 			DeleteNode();
@@ -208,12 +210,20 @@ public class User : MonoBehaviour
 		}
 	}
 
+	/*
+	 * Deletes current dragging node
+	 */
 	private void DeleteNode()
 	{
-		if (!_isDragging) return;
+		/*
+		 * If not dragging, stop deleting
+		 */
+		if (!_isDragging)
+			return;
 
 		_nodeDragging.GetComponent<Node>().DeleteNode();
 
+		// Reset dragging
 		_nodeDragging = default;
 		_isDragging = false;
 	}
@@ -251,21 +261,6 @@ public class User : MonoBehaviour
 		}
 	}
 
-	public void ClearNodes()
-	{
-		GameObject[] allNodes = GameObject.FindGameObjectsWithTag("Node");
-
-		foreach (GameObject go in allNodes)
-		{
-			Node currentNode = go.GetComponent<Node>();
-			if (currentNode.GetNodeType() != NodeType.START &&
-				currentNode.GetNodeType() != NodeType.END)
-			{
-				currentNode.DeleteNode();
-			}
-		}
-	}
-
 	/*
 	 * Corourinte for dragging a node
 	 */
@@ -274,13 +269,35 @@ public class User : MonoBehaviour
 		// Set dragging flag
 		_isDragging = true;
 
+		// Save main camera to temporary variable
+		Camera mainCam = Camera.main;
+
+		// Get current mouse position
+		Vector2 mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+
+		// Save node transform to temporary variable
+		Transform nodeTransform = _nodeDragging.transform;
+
+		// Get the node offset from the mouse
+		float nodeXOffset = mousePosition.x - nodeTransform.position.x;
+		float nodeYOffset = mousePosition.y - nodeTransform.position.y;
+
 		/*
 		 * Loop while a node is being dragged
 		 */
 		while (_isDragging)
 		{
+			// Update mouse position
+			mousePosition = mainCam.ScreenToWorldPoint(Input.mousePosition);
+			// Get new node position with offset
+			Vector2 newNodePosition = mousePosition - new Vector2(nodeXOffset, nodeYOffset);
+
+			// Round new position to single decimal point values (snapping)
+			newNodePosition.x = Mathf.Round(newNodePosition.x * 10) / 10;
+			newNodePosition.y = Mathf.Round(newNodePosition.y * 10) / 10;
+
 			// Set node position to mouse position
-			_nodeDragging.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			nodeTransform.position = newNodePosition;
 			
 			/*
 			 * Update all line positions in dragging node

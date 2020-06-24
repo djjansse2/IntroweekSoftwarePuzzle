@@ -2024,7 +2024,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1199761037}
+      - m_Target: {fileID: 1199761038}
         m_MethodName: Upload
         m_Mode: 1
         m_Arguments:
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1199761035}
+      - m_Target: {fileID: 1199761038}
         m_MethodName: ClearNodes
         m_Mode: 1
         m_Arguments:

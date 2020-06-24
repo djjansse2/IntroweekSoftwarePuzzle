@@ -12,20 +12,14 @@ public class Parser : MonoBehaviour
 	public const int CMD_ENDIF		= 104;
 	public const int CMD_SET_MODE	= 105;
 
-	////////// COMMUNICATION MACROS //////////
-	public const int END_PROGRAM	= 199;
-	public const int PROGRAM_SUCCES	= 198;
+	public	Node currentNode;
+	public	int ifCount;
 
+    public	static Parser	instance;
 
+	public	List<Command>	cmdList			= new List<Command>();
 
-	public Node currentNode;
-	public int ifCount;
-
-    public static Parser	instance;
-
-	private List<Command>	cmdList			= new List<Command>();
-
-	private NotificationHandler notificationHandler;
+	private NotificationHandler _notificationHandler;
 
 
 
@@ -42,48 +36,18 @@ public class Parser : MonoBehaviour
 
 	private void Start()
 	{
-		notificationHandler = NotificationHandler.instance;
-		SerialCommunication.dataReceivedCallback += CheckProgramFeedback;
-	}
-
-	public void Upload()
-	{
-		ResetParser();
-
-		Node startNode = GetStartNode();
-
-		if (startNode == default)
-		{
-			notificationHandler.NotifyError("No start node present");
-			return;
-		}
-
-		if (!parseNodes(startNode)) return;
-		Optimize();
-
-		foreach (Command cmd in cmdList)
-		{
-			SerialCommunication.WriteToSerialPort(cmd.command);
-		}
-
-		SerialCommunication.WriteToSerialPort(END_PROGRAM);
-	}
-
-	public void ResetParser()
-	{
-		if (cmdList.Count > 0)
-		{
-			foreach(Command cmd in cmdList)
-			{
-				cmd.node.ResetNode();
-			}
-		}
-
-		cmdList.Clear();
+		_notificationHandler = NotificationHandler.instance;
 	}
 
 	#region Node adding
 
+	/*
+	 * Adds a new command to the command list
+	 * 
+	 * aCmd		: Command
+	 * aNode	: Node responsible for the command
+	 * (aLabel)	: Label for command (used in optimizer)
+	 */
 	public void AddCommand(int aCmd, Node aNode)
 	{
 		cmdList.Add(new Command(aCmd, aNode));
@@ -96,10 +60,45 @@ public class Parser : MonoBehaviour
 
 	#endregion
 
+	#region Parsing
+
+	/*
+	 * Resets the parser
+	 */
+	public void ResetParser()
+	{
+		/*
+		 * Check if the command list is empty
+		 */
+		if (cmdList.Count > 0)
+		{
+			/*
+			 * Reset all nodes in command list
+			 */
+			foreach(Command cmd in cmdList)
+			{
+				cmd.node.ResetNode();
+			}
+		}
+
+		// Empties list
+		cmdList.Clear();
+	}
+
+	/*
+	 * Finds the start node
+	 * 
+	 * Returns	: Start node
+	 */
 	private Node GetStartNode()
 	{
+		// Get all node objects
 		GameObject[] allNodes = GameObject.FindGameObjectsWithTag("Node");
 
+		/*
+		 * Loop through all node objects to find
+		 * start node
+		 */
 		foreach (GameObject go in allNodes)
 		{
 			if (go.GetComponent<Node>().GetNodeType() == NodeType.START)
@@ -111,26 +110,62 @@ public class Parser : MonoBehaviour
 		return default;
 	}
 
-	private bool parseNodes(Node aStartNode)
+	/*
+	 * Parse all nodes
+	 * 
+	 * Returns	: Boolean, true when parsing succes
+	 */
+	public bool ParseNodes()
 	{
-		if (aStartNode.nextNode == default)
+		// Get start node
+		Node startNode = GetStartNode();
+		
+		/*
+		 * Check if start node exists, if not
+		 * log the error and stop parsing
+		 */
+		if (startNode == default)
 		{
-			notificationHandler.NotifyError("No nodes attached to start node");
+			_notificationHandler.NotifyError("No start node present");
+			return false;
+		}
+		/*
+		 * Check if start node is connected to
+		 * another node, if not log the error and
+		 * stop parsing
+		 */
+		if (startNode.nextNode == default)
+		{
+			_notificationHandler.NotifyError("No nodes attached to start node");
 			return false;
 		}
 
+		// Reset if counter
 		ifCount = 0;
 
-		currentNode = aStartNode.nextNode;
+		// Set current node to start node
+		currentNode = startNode.nextNode;
 		
+		/*
+		 * Parse all nodes till the end node
+		 */
 		while (currentNode.GetNodeType() != NodeType.END)
 		{
+			/*
+			 * Check if the next node of the current
+			 * node is set, if not log error and stop
+			 * parsing
+			 */
 			if (currentNode.nextNode == default)
 			{
-				notificationHandler.NotifyError("Floating input found at: " + currentNode);
+				_notificationHandler.NotifyError("Floating input found at: " + currentNode);
 				return false;
 			}
 
+			/*
+			 * If parsing of node returns true, set 
+			 * current node to next node
+			 */
 			if (currentNode.Parse())
 				currentNode = currentNode.nextNode;
 		}
@@ -138,42 +173,97 @@ public class Parser : MonoBehaviour
 		return true;
 	}
 
-	private void Optimize()
+	#endregion
+
+	#region Optimizer
+
+	/*
+	 * Optimize commands, second iteration of
+	 * parsing
+	 */
+	public void Optimize()
 	{
+		/*
+		 * Loop through all commands, optimize
+		 * if and jump commands
+		 */
 		for (int i = 0; i < cmdList.Count; i++)
 		{
 			if (cmdList[i].command == CMD_IF)
 			{
-				for (int j = i; j < cmdList.Count; j++)
-				{
-					if (cmdList[j].command == CMD_JUMP &&
-						cmdList[j].label == cmdList[i].label)
-					{
-						cmdList[i + 1] = new Command(j + 2, cmdList[i + 1].label, cmdList[i + 1].node);
-						break;
-					}
-				}
+				OptimizeIf(i);
 			}
-
 			if (cmdList[i].command == CMD_JUMP)
 			{
-				for (int j = i; j < cmdList.Count; j++)
-				{
-					if (cmdList[j].command == CMD_ENDIF &&
-						cmdList[j].label == cmdList[i].label)
-					{
-						cmdList[i + 1] = new Command(j , cmdList[i + 1].label, cmdList[i + 1].node);
-						break;
-					}
-				}
+				OptimizeJump(i);
 			}
 		}
-
-		return;
 	}
 
+	/*
+	 * Optimizes if command
+	 * 
+	 * aIfPosition	: Position of the if command
+	 *				  in the command list
+	 */
+	private void OptimizeIf(int aIfPosition)
+	{
+		/*
+		 * Loop through all commands after if to find
+		 * corelating jump command, set index of "if false
+		 * jump" to the first real command after that
+		 */
+		for (int j = aIfPosition; j < cmdList.Count; j++)
+		{
+			if (cmdList[j].command == CMD_JUMP &&
+				cmdList[j].label == cmdList[aIfPosition].label)
+			{
+				cmdList[aIfPosition + 1] = new Command(j + 2, cmdList[aIfPosition + 1].label, cmdList[aIfPosition + 1].node);
+				return;
+			}
+		}
+	}
+
+	/*
+	 * Optimizes jump command
+	 * 
+	 * aJumpPosition	: Position of the jump
+	 *					  command in the command list
+	 */
+	private void OptimizeJump(int aJumpPosition)
+	{
+		/*
+		 * Loop through all commands after jump command
+		 * to find corelating endif command, when found
+		 * set jump parameter to this position
+		 */
+		for (int j = aJumpPosition; j < cmdList.Count; j++)
+		{
+			if (cmdList[j].command == CMD_ENDIF &&
+				cmdList[j].label == cmdList[aJumpPosition].label)
+			{
+				cmdList[aJumpPosition + 1] = new Command(j , cmdList[aJumpPosition + 1].label, cmdList[aJumpPosition + 1].node);
+				return;
+			}
+		}
+	}
+
+	#endregion
+
+	/*
+	 * Finds an if command with a certain label
+	 * 
+	 * aLabel	: Label to look for
+	 * 
+	 * Returns	: If command with given label
+	 */
 	public Command FindIfWithLabel(int aLabel)
 	{
+		/*
+		 * Loop through all commands in command list
+		 * if command is IF and label matches, return
+		 * command
+		 */
 		foreach (Command cmd in cmdList)
 		{
 			if (cmd.command == CMD_IF &&
@@ -183,16 +273,15 @@ public class Parser : MonoBehaviour
 
 		return default;
 	}
-
-	public void CheckProgramFeedback(int aFeedback)
-	{
-		if (aFeedback == PROGRAM_SUCCES)
-		{
-			notificationHandler.NotifySucces("Programming succes");
-		}
-	}
 }
 
+/*
+ * Data container for commands
+ * 
+ * command	: Command code
+ * label	: Label used in optimizer
+ * node		: Node responsible for this command
+ */
 public struct Command
 {
 	public int	command;
