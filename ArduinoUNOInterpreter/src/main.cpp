@@ -6,6 +6,10 @@
 
 #define END_PROGRAM	199
 
+#define STATE_PIN	12
+#define RESET_DELAY 10
+#define RESET_BLINK 100
+
 static Interpreter* myInterpreter = new Interpreter();
 
 bool taskReadPort();
@@ -13,17 +17,31 @@ void taskRunAssembly();
 
 int buffer[100];
 int bufferPointer = 0;	
+
+////////// DEBUGGING VARIABLES ///////////
+bool doesResetDelay = true;
 	
 void setup()
 {
 	Serial.begin(9600);
 
-	pinMode(2, OUTPUT);
-	pinMode(3, OUTPUT);
-	pinMode(4, INPUT);
+	pinMode(STATE_PIN, OUTPUT);
 
+	int timer = 0;
+
+	while (doesResetDelay && timer < RESET_DELAY * 1000)
+	{
+		digitalWrite(STATE_PIN, HIGH);
+		delay(RESET_BLINK);
+		digitalWrite(STATE_PIN, LOW);
+		delay(RESET_BLINK);
+
+		timer += 2 * RESET_BLINK;
+	}
+
+	digitalWrite(STATE_PIN, HIGH);
 	while (!taskReadPort());
-	Serial.print('a');
+	digitalWrite(STATE_PIN, LOW);
 }
 
 void loop()

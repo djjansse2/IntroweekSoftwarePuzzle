@@ -80,6 +80,9 @@ void Interpreter::runCommand(int aCommand)
 	case IF:
 		ifFalse();
 		break;
+	case SET_PIN_MODE:
+		setPinMode();
+		break;
 		
 	default:
 		break;
@@ -122,4 +125,11 @@ void Interpreter::ifFalse()
 	++_asmPointer;
 	if (!_readRegister)
 		_asmPointer = _assembly[_asmPointer] - 1;
+}
+
+void Interpreter::setPinMode()
+{
+	int pin = _assembly[++_asmPointer];
+	int value = _assembly[++_asmPointer];
+	pinMode(pin, value);
 }

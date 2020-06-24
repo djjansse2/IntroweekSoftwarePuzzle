@@ -3,11 +3,12 @@
 
 #include "Arduino.h"
 
-#define WRITE_PIN	100
-#define READ_PIN	101
-#define JUMP		102
-#define IF			103
-#define END_IF		104
+#define WRITE_PIN		100
+#define READ_PIN		101
+#define JUMP			102
+#define IF				103
+#define END_IF			104
+#define SET_PIN_MODE	105
 
 class Interpreter
 {
@@ -29,6 +30,7 @@ private:
 	void	readPin();
 	void	jump();
 	void	ifFalse();
+	void	setPinMode();
 
 private:
 	int*	_assembly;
