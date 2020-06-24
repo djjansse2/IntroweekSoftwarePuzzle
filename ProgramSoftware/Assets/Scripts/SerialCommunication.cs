@@ -6,11 +6,32 @@ using UnityEngine;
 
 public class SerialCommunication : MonoBehaviour
 {
-    private static SerialPort _serPort;
+    private static SerialPort	_serPort;
+
+	private static string		_serPortID;
 
     private void Start()
     {
-        _serPort = new SerialPort("COM7", 9600);
+		OpenSerialPort();
+
+		StartCoroutine("ReadSerialPort");
+    }
+
+	private void OnApplicationQuit()
+	{
+		_serPort.Close();
+	}
+
+	public static void SetSerialPortID(string aSerialPortNumber)
+	{
+		_serPortID = "com" + aSerialPortNumber;
+	}
+
+	public void OpenSerialPort()
+	{
+		if (_serPort != null) return;
+
+		_serPort = new SerialPort(_serPortID, 9600);
 		_serPort.DataReceived += new SerialDataReceivedEventHandler(SerialDataReceived);
 
 		try
@@ -21,13 +42,6 @@ public class SerialCommunication : MonoBehaviour
 		{
 			Debug.LogError(ex);
 		}
-
-		StartCoroutine("ReadSerialPort");
-    }
-
-	private void OnApplicationQuit()
-	{
-		_serPort.Close();
 	}
 
 	public static void WriteToSerialPort(int aMessage)
