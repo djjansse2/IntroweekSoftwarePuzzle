@@ -30,6 +30,9 @@ void setup()
 
 	int timer = 0;
 
+	/////////////////
+	/// BOOT MODE ///
+	/////////////////
 	while (doesResetDelay && timer < RESET_DELAY * 1000)
 	{
 		digitalWrite(STATE_PIN, HIGH);
@@ -40,6 +43,9 @@ void setup()
 		timer += 2 * RESET_BLINK;
 	}
 
+	////////////////////
+	/// PROGRAM MODE ///
+	////////////////////
 	digitalWrite(STATE_PIN, HIGH);
 	while (!taskReadPort());
 	Serial.print((char)PROGRAM_SUCCESS);
@@ -48,6 +54,9 @@ void setup()
 
 void loop()
 {
+	////////////////
+	/// RUN MODE ///
+	////////////////
 	taskRunAssembly();
 }
 
