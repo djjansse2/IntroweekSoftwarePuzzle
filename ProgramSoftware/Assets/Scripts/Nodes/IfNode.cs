@@ -34,7 +34,9 @@ public class IfNode : Node
 	{
 		Parser parser = Parser.instance;
 
+		// Increment if count and add if command with if count as label
 		parser.AddCommand(Parser.CMD_IF, ++parser.ifCount, this);
+		// Add if counter as argument
 		parser.AddCommand(parser.ifCount, this);
 		return true;
 	}

@@ -15,7 +15,9 @@ public class ReadInputNode : Node
 	{
 		Parser parser = Parser.instance;
 		
+		// Add read command
 		parser.AddCommand(Parser.CMD_READ, this);
+		// Add pin to read as argument
 		parser.AddCommand(int.Parse(portInput.text), this);
 
 		return true;

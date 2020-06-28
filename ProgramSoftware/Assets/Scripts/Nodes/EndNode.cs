@@ -16,6 +16,7 @@ public class EndNode : Node
 
 	public override void DeleteNode()
 	{
+		// Notify that the node must not be deleted, and override default delete method
 		NotificationHandler.instance.NotifyWarning("Do Not Delete End Node");
 	}
 }

@@ -22,10 +22,14 @@ public class SetPinTypeNode : Node
 
 		Parser parser = Parser.instance;
 
+		// Get mode value
 		int value = (portValue.isOn) ? 1 : 0;
 		
+		// Add pin time command
 		parser.AddCommand(Parser.CMD_SET_MODE, this);
+		// Add pin to set mode as argument
 		parser.AddCommand(int.Parse(portInput.text), this);
+		// Add mode value as argument
 		parser.AddCommand(value, this);
 
 		return true;

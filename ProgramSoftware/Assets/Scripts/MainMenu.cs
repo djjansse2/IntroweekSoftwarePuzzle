@@ -9,9 +9,12 @@ public class MainMenu : MonoBehaviour
 
 	public void StartMainScene()
 	{
+		// Get the input from the text field
 		string portNumber = comPortInput.text;
 
+		// Open the required serial port
 		SerialCommunication.SetSerialPortID(portNumber);
+		// Load the main scene
 		SceneManager.LoadScene("MainScene");
 	}
 }
